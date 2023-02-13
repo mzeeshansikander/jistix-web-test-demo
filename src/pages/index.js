@@ -3,21 +3,25 @@ import Image from 'next/image'
 import { Inter } from '@next/font/google'
 import styles from '@/styles/Home.module.css'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useState } from 'react'
+
 
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   const router = useRouter();
-  
+  const [state, setState] = useState();
   function handleClick() {
-   router.push("jistix://jistix/barcode");
+    router.push("jistix://jistix/barcode");
   }
 
-  React.useEffect(()=>{
-    
-    console.log({router: router})
-  },[])
+  React.useEffect(() => {
+    const { code } = router.query;
+    if (code) {
+      setState(code);
+    }
+  }, []);
+ 
 
   return (
     <>
@@ -30,13 +34,24 @@ export default function Home() {
       <>
       <div className="home">
         <div className="links">
-          <h1>Your barcode is:</h1>
-          <button onClick={handleClick}>click</button>
+          {state ? <h1>Your barcode is: {state}</h1> : null}
+          <button className='button' onClick={handleClick}>Scan QR Code</button>
         </div>
-
       </div>
-        <br />
+      <br />
+      
     </>
     </>
   )
+}
+
+
+export async function getServerSideProps(context) {
+  const query = context.query;
+
+  return {
+    props: {
+      query,
+    }, // will be passed to the page component as props
+  };
 }
